@@ -11,3 +11,6 @@ Base keycap derived from kekstee's repo https://github.com/kekstee/3dprint
 ![Screenshot](https://raw.github.com/bbenchoff/CherryKeycap/master/Helmet/threequarters.png)
 
 
+![Screenshot](https://raw.github.com/bbenchoff/CherryKeycap/master/Lofted/Lofted.png.png)
+
+
