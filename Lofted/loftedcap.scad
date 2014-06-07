@@ -1,42 +1,45 @@
-// Row 4 decorated Cherry MX key
-use <keytop.scad>;
+use <models.scad>;
 
 // dimensions Cherry MX connector
 c_corr = .4;                // tolerance
 c_horiz = 1.1;              // horizontal bar width
 c_vert = 1.0;               // vertical bar width
 c_dia = 4;                  // cross width
-c_depth = 6;                // connector depth
+c_depth = 7;                // connector depth
 c_space = 4;                // height of hollow inside
-c_inset = 0;              // distance connector start to keycap base
+c_inset = .25;              // distance connector start to keycap base
 
-// decoration
-obj = "LoftedCap.stl";            // decoration object
-obj_pos = [-0.7,-0.5,4];        // decoration offset
-obj_scale = [1,1,1]; // decoration scale
-obj_rot = [0,0,0];          // decoration rotation
-
-// keycap shape
-head_tilt = 0;              // rotation of top around x-axis
-head_pos = 2.25;            // keycap top y-offset
-head_height = 11;           // z-offset of keycap top from the bottom of the keycap
 cutoff = 6.5;               // cut keycap here to make room for decoration
                             // must be bigger than c_space + c_corr
 key_scale = [1.02,1.02,1.02]; // overall scale
 
+
 // stuff
-$fn = 300;
+$fn = 64;
 
-// create basic key shape from dxf frames for base and top
-module shape()
+module key()
 {
-	
-		   hull()
-    		{
-       		translate([0,0,-c_inset]) scale([0.95,0.95,0.95]) linear_extrude(height=.01) import("base.dxf");
-        rotate([head_tilt,0,0]) translate([0,0,6.5]) scale([.113,.113,.14]) linear_extrude(height=2)circle(r=45);
-    		}
-
+	difference()
+	{
+		difference()
+		{
+			intersection()
+			{
+				translate([-13.75,-13.75,0])scale([25.5,25.5,35])import("LoftedCap.stl");
+				translate([0,0,-30])sphere(r=40, $fn=300);
+			}
+			difference()
+			{
+				translate([0,1,0])scale([.2,.2,.2])linear_extrude(height=50)face();
+				translate([0,0,-30.4])sphere(r=40, $fn=300);
+			}
+		}
+	   hull()
+	   {
+	        scale([0.95,0.95,0.95])translate([0,0,0]) linear_extrude(height=1) import("base.dxf");
+	        scale([1.1,1.1,1.1])translate([0,7]) linear_extrude(height=6.5) import("top.dxf");
+	   }
+	}
 }
 
 // construct the connector pin
@@ -49,40 +52,14 @@ module connector()
     }
 }
 
-// create the hollow key with decoration
-module key()
-{
-	difference()
-   {
-    // combine basic key shape with decoration
-    union()
-    {
-        translate(obj_pos) rotate(obj_rot) scale(obj_scale) import(obj);
-        
-        difference()
-        {
-            shape();
-            rotate([head_tilt,0,0]) translate([0,0,5+cutoff-c_inset]) cube([100,100,10], center=true);
-        }
-    }
-
-    // subtract scaled basic shape, cut at minimum required height
-    difference()
-    {
-        scale([.9,.9,.9]) translate([0,0,-1]) shape();
-        translate([0,0,5+c_space+c_corr]) cube([100,100,10], center=true);
-    }
-    }
-}
-
 // combine key, pin and connector. cleanup below the key
 scale(key_scale) difference()
 {
-	union() 
-   { 
-   	key();
-      cylinder( h=c_space+c_corr, r=(c_dia+1+c_corr)/2 );
-   }
+    union() 
+    { 
+        translate([0,0,-2])key();
+        cylinder( h=7., r=(c_dia+1+c_corr)/2 );
+    }
     
 	connector();
 	translate([0,0,-50-c_inset]) cube([100,100,100], center=true);
